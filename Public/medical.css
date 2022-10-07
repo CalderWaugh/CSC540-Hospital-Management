@@ -1,0 +1,39 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family: sans-serif;
+}
+
+body {
+    background: #3e5669;
+}
+
+.main {
+    position: absolute;
+    top: 50%;
+    left: 10%;
+}
+
+h1 {
+    position: absolute;
+    top: 45%;
+    left: 10%;
+}
+
+.select {
+    position: absolute;
+    top: 0%;
+    left: 45%;
+}
+
+.patient {
+    position: absolute;
+    top: 0%;
+    left: 50%;
+}
+
+.table {
+    position: absolute;
+    top: 50%;
+    left: 75%
+}
