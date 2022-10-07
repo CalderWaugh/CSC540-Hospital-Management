@@ -37,3 +37,9 @@ h1 {
     top: 50%;
     left: 75%
 }
+
+.search {
+    position: absolute;
+    top: 55%;
+    left: 10%;
+}
