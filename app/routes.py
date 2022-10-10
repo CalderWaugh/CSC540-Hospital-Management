@@ -19,11 +19,13 @@ EMAIL = environ.get('EMAIL')
 def index():
     return render_template('homepage.html')
 
+
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     logout_user()
     return redirect(url_for('index'))
     
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signupacctype():
     form = SignupAccTypeForm()
