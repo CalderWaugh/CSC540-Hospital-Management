@@ -19,6 +19,10 @@ EMAIL = environ.get('EMAIL')
 def index():
     return render_template('homepage.html')
 
+@app.route('/')
+def index():
+    return render_template('homepage.html')
+
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
