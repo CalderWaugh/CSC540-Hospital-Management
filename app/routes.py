@@ -21,7 +21,7 @@ def index():
 
 @app.route('/')
 def index():
-    return render_template('homepage.html')
+    return render_template('medical.html')
 
 
 @app.route('/logout', methods=['GET', 'POST'])
