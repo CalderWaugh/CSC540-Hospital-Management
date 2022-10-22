@@ -10,13 +10,13 @@ body {
 
 .main {
     position: absolute;
-    top: 50%;
+    top: 70%;
     left: 10%;
 }
 
 h1 {
     position: absolute;
-    top: 45%;
+    top: 65%;
     left: 10%;
 }
 
@@ -34,12 +34,18 @@ h1 {
 
 .table {
     position: absolute;
-    top: 50%;
+    top: 65%;
     left: 75%
 }
 
 .search {
     position: absolute;
-    top: 55%;
+    top: 75%;
     left: 10%;
+}
+
+.picture {
+    position: absolute;
+    top: 5%;
+    left: 15%;
 }
