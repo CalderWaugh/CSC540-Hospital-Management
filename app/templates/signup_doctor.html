@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Signup Doctor</h2>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.emp_id.label }} <br>
+            {{ form.emp_id() }}
+        </p>
+        <p>
+            {{ form.password.label }} <br>
+            {{ form.password() }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}

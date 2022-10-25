@@ -3,43 +3,40 @@ from wtforms import StringField, IntegerField, SubmitField, StringField, Passwor
 from wtforms.validators import DataRequired, Optional
 
 def buildLoginForm(data):
-    if data:
+    if data=='doctor':
         class LoginForm(FlaskForm):
-            username = StringField('Username', validators=[DataRequired()], default=data['username'])
+            emp_id = StringField('Doctor Employee ID', validators=[DataRequired()])
             password = PasswordField('Password', validators=[DataRequired()])
             submit = SubmitField('Log in')
     else:
         class LoginForm(FlaskForm):
-            username = StringField('Username', validators=[DataRequired()])
+            emp_id = StringField('Nurse Employee ID', validators=[DataRequired()])
             password = PasswordField('Password', validators=[DataRequired()])
             submit = SubmitField('Log in')
     return LoginForm()
 
-class SignupEmpForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    name = StringField('Name', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired()])
-    city = StringField('City', validators=[DataRequired()])
-    state = StringField('State', validators=[DataRequired()])
-    phone_number = StringField('Phone', validators=[DataRequired()])
-    company = StringField('Company', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    submit = SubmitField('Sign up')
 
-class SignupStudentForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    name = StringField('Name', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired()])
-    city = StringField('City', validators=[DataRequired()])
-    state = StringField('State', validators=[DataRequired()])
-    phone_number = StringField('Phone', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    submit = SubmitField('Sign up')
+def buildSignupForm(data):
+    if data=='doctor':
+        class LoginForm(FlaskForm):
+            emp_id = StringField('Doctor Employee ID', validators=[DataRequired()])
+            password = PasswordField('Password', validators=[DataRequired()])
+            submit = SubmitField('Sign up')
+    else:
+        class LoginForm(FlaskForm):
+            emp_id = StringField('Nurse Employee ID', validators=[DataRequired()])
+            password = PasswordField('Password', validators=[DataRequired()])
+            submit = SubmitField('Log in')
+    return LoginForm()
 
-class SignupAccTypeForm(FlaskForm):
-    account_type = SelectField('Account Type', choices=['student', 'employer'], validators=[DataRequired()])
+class SelectLoginForm(FlaskForm):
+    account_type = SelectField('Account Type', choices=['doctor', 'nurse'], validators=[DataRequired()])
     submit = SubmitField('Continue')
 
-class UserSearchForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+class SignupAccTypeForm(FlaskForm):
+    account_type = SelectField('Account Type', choices=['doctor', 'nurse'], validators=[DataRequired()])
+    submit = SubmitField('Continue')
+
+class PatientSearchForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
     submit = SubmitField('Search')

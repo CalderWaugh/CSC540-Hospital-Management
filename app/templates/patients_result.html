@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Results for: '{{name}}'</h2>
+    {% for res in results %}
+        <p>{{res}}</p>
+    {% endfor %}
+    
+{% endblock %}

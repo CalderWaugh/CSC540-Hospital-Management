@@ -2,22 +2,42 @@ from flask import Flask
 
 from dotenv import load_dotenv
 from os import environ
+import mysql.connector
+from mysql.connector import Error
+# from flask_login import (
+#     LoginManager,
+#     UserMixin,
+#     current_user,
+#     login_required,
+#     login_user,
+#     logout_user,
+# )
 
 # force loading of environment variables
 load_dotenv('.flaskenv')
 
-# Get the environment variables from .flaskenv
-IP = environ.get('MYSQL_IP')
-USERNAME = environ.get('MYSQL_USER')
-PASSWORD = environ.get('MYSQL_PASS')
-DB_NAME = environ.get('MYSQL_DB')
-
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'MeDClinic'
 
-# Specify the connection parameters/credentials for the database
-DB_CONFIG_STR = f"mysql+mysqlconnector://{USERNAME}:{PASSWORD}@{IP}/{DB_NAME}"
+try:
+    connection = mysql.connector.connect(host='localhost',
+                                         database=environ.get('MYSQL_DB'),
+                                         user=environ.get('MYSQL_USER'),
+                                         password=environ.get('MYSQL_PASS'))
+    if connection.is_connected():
+        db_Info = connection.get_server_info()
+        print("Connected to MySQL Server version ", db_Info)
+        cursor = connection.cursor()
+        # cursor.execute("select * from test;")
+        # record = cursor.fetchone()
+        # print(record)
+
+except Error as e:
+    print("Error while connecting to MySQL", e)
+
+ 
+# login_manager = LoginManager(app)
+
 
 # Add routes
 from app import routes
