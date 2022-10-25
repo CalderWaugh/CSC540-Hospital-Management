@@ -21,9 +21,9 @@ app.config['SECRET_KEY'] = 'MeDClinic'
 
 try:
     connection = mysql.connector.connect(host='localhost',
-                                         database=environ.get('MYSQL_DB'),
-                                         user=environ.get('MYSQL_USER'),
-                                         password=environ.get('MYSQL_PASS'))
+                                         database=environ.get(''),
+                                         user=environ.get(''),
+                                         password=environ.get(''))
     if connection.is_connected():
         db_Info = connection.get_server_info()
         print("Connected to MySQL Server version ", db_Info)
