@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% for a in appointments %}
+        {{ a.appointment_id }}
+        {{ a.patient_id }}
+        {{ a.doctor_employee_id }}
+        {{ a.exam_type }}
+    {% endfor %}
+{% endblock %}
