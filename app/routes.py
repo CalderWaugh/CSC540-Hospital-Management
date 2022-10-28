@@ -107,6 +107,7 @@ def loginnurse():
     form = buildLoginForm('nurse')
     return render_template('login_nurse.html', form=form)
     
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signupacctype():
     return render_template('signup.html')

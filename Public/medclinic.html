@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" type="text/css" href="medclinic.css">
+<title>MediClinic</title>
+
+<body>
+
+
+    <div class="select">
+        <button type="button">Appointment</button>
+    </div>
+
+    <div class="patient">
+        <button type="button">Patient</button>
+    </div>
+
+
+    <div class="picture">
+
+        <img src="Mediclin111ic.jpg" alt="Medclinic">
+
+
+
+        <h1>Doctor</h1>
+        <div class="main">
+            <input type="text" name="box" placeholder="Search for Doctor">
+        </div>
+
+        <div class="search">
+
+            <button type="button">search</button>
+
+
+        </div>
+
+        <div class="move">
+
+
+        </div>
+
+
+
+    </div>
+
+    <div class="table">
+        <div class="calendar" id="calendar">
+            <div class="calendar-btn month-btn" onclick="$('#months').toggle('fast')">
+                <span id="curMonth"></span>
+                <div id="months" class="months dropdown"></div>
+            </div>
+
+            <div class="calendar-btn year-btn" onclick="$('#years').toggle('fast')">
+                <span id="curYear"></span>
+                <div id="years" class="years dropdown"></div>
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="calendar-dates">
+                <div class="days">
+                    <div class="day label">SUN</div>
+                    <div class="day label">MON</div>
+                    <div class="day label">TUE</div>
+                    <div class="day label">WED</div>
+                    <div class="day label">THUR</div>
+                    <div class="day label">FRI</div>
+                    <div class="day label">SAT</div>
+
+                    <div class="clear"></div>
+                </div>
+
+                <div id="calendarDays" class="days">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <div class="tables">
+
+        <table>
+            <tr>
+                <th>Name:</th>
+                <td>John Carter</td>
+            </tr>
+            <tr>
+                <th rowspan="1">appointment:</th>
+                <td>9:00/10:00</td>
+            </tr>
+
+            <tr>
+                <td></td>
+
+            </tr>
+
+
+            <tr>
+                <th>Name:</th>
+                <td>Peter Smith</td>
+            </tr>
+            <tr>
+                <th rowspan="1">appointment:</th>
+                <td>9:00/10:00</td>
+            </tr>
+
+            <tr>
+                <br>
+
+            </tr>
+
+            <tr>
+                <th>Name:</th>
+                <td>Allison Kelly</td>
+            </tr>
+            <tr>
+                <th rowspan="1">appointment:</th>
+                <td>9:00/10:00</td>
+            </tr>
+            <tr>
+                <td></td>
+
+            </tr>
+
+
+
+
+        </table>
+
+    </div>
+
+
+    <div class="bottom">
+        <footer>
+            <p>MediClinic: Support </p>
+            <p><a href="mailto:Medclinic@support.com">Medclinic@support.com</a></p>
+        </footer>
+
+    </div>
+
+</body>
+
+
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="meds.js" async defer></script>
+
+
+
+</html>
