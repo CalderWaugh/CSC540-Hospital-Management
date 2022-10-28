@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>Login Doctor</h2>
+    <h2>Signup Nurse</h2>
     <form action="" method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
@@ -14,7 +14,4 @@
         </p>
         <p>{{ form.submit() }}</p>
     </form>
-    {% if failed %}
-    <p style="color: red">Invalid login</p>
-    {% endif %}
 {% endblock %}

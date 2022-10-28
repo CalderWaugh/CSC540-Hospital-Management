@@ -20,6 +20,7 @@ def buildSignupForm(data):
     if data=='doctor':
         class LoginForm(FlaskForm):
             emp_id = StringField('Doctor Employee ID', validators=[DataRequired()])
+            name = StringField('Name', validators=[DataRequired()])
             password = PasswordField('Password', validators=[DataRequired()])
             submit = SubmitField('Sign up')
     else:
@@ -38,5 +39,6 @@ class SignupAccTypeForm(FlaskForm):
     submit = SubmitField('Continue')
 
 class PatientSearchForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
+    first_name = StringField('First name', validators=[DataRequired()])
+    last_name = StringField('Last name', validators=[DataRequired()])
     submit = SubmitField('Search')

@@ -35,7 +35,17 @@ try:
 except Error as e:
     print("Error while connecting to MySQL", e)
 
- 
+cursor.execute(f"select * from doctor")
+result = cursor.fetchall()
+users = {}
+for r in result:
+    users[r[0]] = r
+
+cursor.execute(f"select * from nurse")
+result = cursor.fetchall()
+for r in result:
+    users[r[0]] = r
+
 # login_manager = LoginManager(app)
 
 
