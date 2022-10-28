@@ -20,6 +20,7 @@ def buildSignupForm(data):
     if data=='doctor':
         class LoginForm(FlaskForm):
             emp_id = StringField('Doctor Employee ID', validators=[DataRequired()])
+            name = StringField('Name', validators=[DataRequired()])
             password = PasswordField('Password', validators=[DataRequired()])
             submit = SubmitField('Sign up')
     else:

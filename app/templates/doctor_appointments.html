@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <h2>Appointments for {{ doc_name }}</h2>
     {% for a in appointments %}
         {{ a.appointment_id }}
         {{ a.patient_id }}
