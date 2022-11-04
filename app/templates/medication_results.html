@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Medications</h3>
+
+<div style="padding: 0 25%;">
+<table class ="table" style="background-color: #88d498;">
+    {% for res in results %}
+    <tr>
+
+<td>Pharmacy ID<br>{{res[0]}}</td>
+<td>Pharamcy Address <br>{{res[1]}} </td>
+    
+   <td>Subscribed<br>{{res[2]}}</td>
+
+    </tr>
+
+    {% endfor %}
+
+
+</table>
+
+
+
+</div>
+
+
+{% for res in results %}
+   
+   
+      
+    {% endfor %}
+    
+{% endblock %}

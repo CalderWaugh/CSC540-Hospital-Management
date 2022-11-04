@@ -42,3 +42,8 @@ class PatientSearchForm(FlaskForm):
     first_name = StringField('First name', validators=[DataRequired()])
     last_name = StringField('Last name', validators=[DataRequired()])
     submit = SubmitField('Search')
+
+
+    class MedicationSearchForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    submit = SubmitField('Search')

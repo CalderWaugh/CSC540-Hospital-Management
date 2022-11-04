@@ -98,6 +98,17 @@ def patient_result(first_name, last_name):
     results = cursor.fetchall()
     return render_template('patients_result.html', first_name=first_name, last_name=last_name, results=results, user=current_user)
 
+
+
+@app.route('/medication/<name>', methods=['GET'])
+def medication_results1(name):
+    cursor.execute(f"SELECT prescription.medication_id, prescription.patient_id, prescription.pharmacy_ID, prescription.pharmacy_address FROM prescription RIGHT JOIN medication ON prescription.medication_id = medication.medication_id ORDER BY prescription.pharmacy_ID  '%{name}%'")
+    results = cursor.fetchall()
+    return render_template('medication_results.html', name=name, results=results)
+
+
+
+
 @app.route('/signup/doctor', methods=['GET', 'POST'])
 def signup_doctor():
     form = buildSignupForm('doctor')
