@@ -39,12 +39,12 @@ cursor.execute(f"select * from doctor")
 result = cursor.fetchall()
 users = {}
 for r in result:
-    users[r[0]] = r
+    users[r[0]] = (r[0],r[5])
 
 cursor.execute(f"select * from nurse")
 result = cursor.fetchall()
 for r in result:
-    users[r[0]] = r
+    users[r[0]] = (r[0],r[5])
 
 # login_manager = LoginManager(app)
 
