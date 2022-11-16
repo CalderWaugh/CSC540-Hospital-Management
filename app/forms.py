@@ -51,3 +51,6 @@ class PatientSearchForm(FlaskForm):
 class CreateAppointmentDoctorForm(FlaskForm):
     doctor_name = StringField('Doctor')
     submit = SubmitField('Search')
+class MedicationSearchForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    submit = SubmitField('Search')

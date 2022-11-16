@@ -5,7 +5,7 @@ from typing import Optional
 import requests
 from app import app, connection, cursor, users
 from flask import render_template, redirect, url_for, flash, send_file
-from app.forms import buildLoginForm, buildSignupForm, SignupAccTypeForm, PatientSearchForm, SignupAccTypeForm, SelectLoginForm
+from app.forms import buildLoginForm, buildSignupForm, SignupAccTypeForm, MedicationSearchForm,PatientSearchForm, SignupAccTypeForm, SelectLoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 from mysql.connector import Error
@@ -67,12 +67,15 @@ def login():
 
 
 
-@app.route('/medication/<name>', methods=['GET'])
-def medication_results1(name):
-    cursor.execute(f"SELECT prescription.medication_id, prescription.patient_id, prescription.pharmacy_ID, prescription.pharmacy_address FROM prescription RIGHT JOIN medication ON prescription.medication_id = medication.medication_id ORDER BY prescription.pharmacy_ID  '%{name}%'")
-    results = cursor.fetchall()
-    return render_template('medication_results.html', name=name, results=results)
-
+@login_required
+@app.route('/medication', methods=['GET', 'POST'])
+def medication():
+    # if not current_user.is_authenticated:
+    #     return redirect(url_for('index'))
+    form = MedicationSearchForm()
+    if form.validate_on_submit():
+        return redirect(url_for('medication_results', name=form.name.data))
+    return render_template('search_medication.html', form=form)
 
 
 
@@ -230,3 +233,27 @@ def new_appointment(patient_id):
     cursor.execute(f"select * from patient where patient_id = {patient_id}")
     patient = cursor.fetchone()
     return render_template('new_appointment.html', patient=patient , user=current_user)
+
+
+
+@app.route('/medication/<name>', methods=['GET'])
+def medication_results(name):
+    cursor.execute(f"select medication_id, medication_name, generic, dosage from medication where medication_id LIKE '%{name}%'")
+    results = cursor.fetchall()
+    cursor.execute(f"SELECT prescription.medication_id, prescription.patient_id, prescription.pharmacy_ID,prescription.pharmacy_address,prescription.refills FROM prescription RIGHT JOIN medication ON prescription.medication_id = medication.medication_id where medication_name LIKE '%{name}%'")
+    result = cursor.fetchall()
+    cursor.execute(f"select pharmacy_id, pharmacy_address, date_prescribed, patient_id from prescription where patient_id LIKE '%{name}%'")
+    result1 = cursor.fetchall()
+    cursor.execute(f"SELECT medication_name, generic FROM medication where generic LIKE '%{name}%'")
+    result2 = cursor.fetchall()
+    cursor.execute(f"select pharmacy_id, pharmacy_address from prescription where pharmacy_id LIKE'%{name}%'")
+    result3 = cursor.fetchall()
+    cursor.execute(f"SELECT prescription.patient_id,prescription.medication_id,patient.first_name, prescription.date_prescribed, prescription.pharmacy_ID,patient.last_name FROM prescription LEFT JOIN patient ON prescription.patient_id = patient.patient_id where last_name LIKE'%{name}%'")
+    result4 = cursor.fetchall()
+    cursor.execute(f"SELECT dosage, medication_name from medication where dosage LIKE'%{name}%'")
+    result5 = cursor.fetchall()
+    cursor.execute(f"SELECT patient_id, last_name from patient where patient_id LIKE'%{name}%'")
+    result6 = cursor.fetchall()
+    return render_template('medication_results.html',  result=result, result1=result1, result2=result2, result3=result3, result4=result4, result5=result5,result6=result6, name=name, results=results,user=current_user)
+
+
