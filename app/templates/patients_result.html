@@ -1,9 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>Results for: '{{first_name}} {{last_name}}'</h2>
-    {% for res in results %}
-        <p>{{res}}</p>
-    {% endfor %}
+    <h3>Matching Patients</h3>
+    <div style="padding: 0 25%;">
+        <table class="table" style="background-color: #88D498;">
+            {% for res in results %}
+                <tr>
+                    <td>{{res[0]}}</td>
+                    <td><a href="/patient/{{res[0]}}">{{res[1]}} {{res[2]}}</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
     
 {% endblock %}

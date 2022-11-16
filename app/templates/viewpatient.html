@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Patient: {{ patient[1] }} {{ patient[2] }}</h2>
+    <div style="display: flex; padding: 0 25%;">
+        <div style="margin: 0 20px;">
+            <h3>Upcoming Appointments</h3>
+            <table class="table table-primary">
+                {% for a in appointments %}
+                <tr>
+                    <td>{{a[0]}}</td>
+                    <td>{{a[1]}}</td>
+                    <td>{{a[2]}}</td>
+                </tr>
+                {% endfor %}
+                <button href="/appointments/new/{{patient[0]}}" class="button">Create Appointment</button>
+            </table>
+        </div>
+        <div style="margin: 0 20px;">
+            <h3>Prescriptions</h3>
+            <table class="table table-primary">
+                <tr>
+                    <th>Medication</th>
+                    <th>Generic</th>
+                    <th>Dosage</th>
+                    <th>Date Prescribed</th>
+                </tr>
+                {% for p in prescriptions%}
+                <tr>
+                    <td>{{p[0]}}</td>
+                    <td>{{p[1]}}</td>
+                    <td>{{p[2]}}</td>
+                    <td>{{p[3]}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+{% endblock %}
