@@ -5,7 +5,7 @@ from typing import Optional
 import requests
 from app import app, connection, cursor, users
 from flask import render_template, redirect, url_for, flash, send_file
-from app.forms import buildLoginForm, buildSignupForm, SignupAccTypeForm, MedicationSearchForm,PatientSearchForm, SignupAccTypeForm, SelectLoginForm
+from app.forms import buildLoginForm, buildSignupForm,medSignupForm, SignupAccTypeForm, MedicationSearchForm,PatientSearchForm, SignupAccTypeForm, SelectLoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 from mysql.connector import Error
@@ -110,6 +110,7 @@ def signup_nurse():
         users[int(form.emp_id.data)]=(form.emp_id.data,pward)
         return redirect(url_for('loginnurse'))
     return render_template('signup_nurse.html', form=form, user=None)
+
 
 @app.route('/login/doctor', methods=['GET', 'POST'])
 def logindoctor():
@@ -257,3 +258,15 @@ def medication_results(name):
     return render_template('medication_results.html',  result=result, result1=result1, result2=result2, result3=result3, result4=result4, result5=result5,result6=result6, name=name, results=results,user=current_user)
 
 
+@app.route('/medicationadd', methods=['GET', 'POST'])
+def medicationADD():
+    form = medSignupForm('Medication')
+    if form.validate_on_submit():
+        executeStr = f"INSERT INTO medication VALUES (%s,%s,%s,%s)"
+        Medication_ID = form.emp_id.data
+        Medication_name = form.name.data
+        Generic = form.department.data
+        Dosage = form.position.data
+        cursor.execute(executeStr, (int(Medication_ID), Medication_name, Generic, Dosage,))
+        connection.commit()
+    return render_template('medicationadd_result.html', form=form, user=None)

@@ -54,3 +54,21 @@ class CreateAppointmentDoctorForm(FlaskForm):
 class MedicationSearchForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     submit = SubmitField('Search')
+
+def medSignupForm(data):
+    if data=='doctor':
+        class SignupForm(FlaskForm):
+            emp_id = StringField('Doctor Employee ID', validators=[DataRequired()])
+            name = StringField('Name', validators=[DataRequired()])
+            department = StringField('Department', validators=[DataRequired()])
+            position = StringField('Position', validators=[DataRequired()])
+            password = PasswordField('Password', validators=[DataRequired()])
+            submit = SubmitField('Sign up')
+    else:
+        class SignupForm(FlaskForm):
+            emp_id = StringField('Medication_ID', validators=[DataRequired()])
+            name = StringField('Medication_Name', validators=[DataRequired()])
+            department = StringField('Generic', validators=[DataRequired()])
+            position = StringField('Dosage', validators=[DataRequired()])
+            submit = SubmitField('submit')
+    return SignupForm()
