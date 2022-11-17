@@ -250,7 +250,7 @@ def medication_results(name):
     result3 = cursor.fetchall()
     cursor.execute(f"SELECT prescription.patient_id,prescription.medication_id,patient.first_name, prescription.date_prescribed, prescription.pharmacy_ID,patient.last_name FROM prescription LEFT JOIN patient ON prescription.patient_id = patient.patient_id where last_name LIKE'%{name}%'")
     result4 = cursor.fetchall()
-    cursor.execute(f"SELECT dosage, medication_name from medication where dosage LIKE'%{name}%'")
+    cursor.execute(f"SELECT dosage, medication_name from medication where dosage LIKE '%{name}%'")
     result5 = cursor.fetchall()
     cursor.execute(f"SELECT patient_id, last_name from patient where patient_id LIKE'%{name}%'")
     result6 = cursor.fetchall()
