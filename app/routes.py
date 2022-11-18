@@ -269,4 +269,5 @@ def medicationADD():
         Dosage = form.position.data
         cursor.execute(executeStr, (int(Medication_ID), Medication_name, Generic, Dosage,))
         connection.commit()
+        return redirect(url_for('index'))
     return render_template('medicationadd_result.html', form=form, user=None)
