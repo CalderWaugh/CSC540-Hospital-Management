@@ -14,7 +14,7 @@
             <td>Patient ID<br>{{res[1]}} </td>
 
             <td>Pharmacy ID<br>{{res[2]}}</td>
-            <td>Pharmacy Address<br>{{res[3]}}</td>
+            <td>Prescription ID<br>{{res[3]}}</td>
             <td>refills<br>{{res[4]}}</td>
 
         </tr>
@@ -59,7 +59,7 @@
 
 
                     <td>Pharmacy ID<br>{{res[0]}}</td>
-                    <td>Pharmacy Address<br>{{res[1]}} </td>
+                    <td>Prescription ID<br>{{res[1]}} </td>
 
                     <td>Date Prescribed<br>{{res[2]}}</td>
 
@@ -103,9 +103,9 @@
 
 
 
-                            <td>Pharmacy ID<br>{{res[0]}}</td>
-                            <td>Pharmacy Address<br>{{res[1]}} </td>
-
+                            <td>Prescription ID<br>{{res[0]}}</td>
+                            <td>Pharmacy Name<br>{{res[1]}} </td>
+                            <td>Pharmacy Address<br>{{res[2]}} </td>
 
 
                         </tr>
@@ -181,13 +181,34 @@
                                 </table>
 
 
+                                <div style="padding: 0 5%;">
+                                    <table class="table" style="background-color: #88d498;">
+                                        {% for res in result7 %}
+                                        <tr>
+
+                                            <td>Prescription ID <br>{{res[0]}}</td>
+                                            <td>Pharmacy ID<br>{{res[1]}} </td>
+
+                                            <td>Medication ID<br>{{res[2]}}</td>
+                                            <td>Paitient ID<br>{{res[3]}}</td>
+
+                                            <td>Date Prescribed <br>{{res[4]}}</td>
+                                            <td>Current diagnosis Severity<br>{{res[5]}} </td>
+                                            <td>Refills<br>{{res[6]}} </td>
+
+                                        </tr>
+
+
+                                        {% endfor %}
+
+
+                                    </table>
+
+
+
+                                </div>
 
 
 
 
-                            </div>
-
-
-
-
-                            {% for res in results %} {% endfor %} {% endblock %}
+                                {% for res in results %} {% endfor %} {% endblock %}

@@ -72,3 +72,24 @@ def medSignupForm(data):
             position = StringField('Dosage', validators=[DataRequired()])
             submit = SubmitField('submit')
     return SignupForm()
+
+
+def pharmSignupForm(data):
+    if data=='doctor':
+         class SignupForm(FlaskForm):
+            emp_id = StringField('Doctor Employee ID', validators=[DataRequired()])
+            name = StringField('Name', validators=[DataRequired()])
+            department = StringField('Department', validators=[DataRequired()])
+            position = StringField('Position', validators=[DataRequired()])
+            password = PasswordField('Password', validators=[DataRequired()])
+            date = StringField('Date_Prescribed', validators=[DataRequired()])
+            diagnosis = StringField('Current_diagnosis_severity', validators=[DataRequired()])
+            amnt = StringField('refills', validators=[DataRequired()])
+            submit = SubmitField('Sign up')
+    else:
+        class SignupForm(FlaskForm):
+            emp_id = StringField('Pharmacy_ID', validators=[DataRequired()])
+            name = StringField('name', validators=[DataRequired()])
+            department = StringField('address', validators=[DataRequired()])
+            submit = SubmitField('submit')
+    return SignupForm()
