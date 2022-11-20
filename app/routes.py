@@ -71,7 +71,7 @@ def login():
 @app.route('/medication', methods=['GET', 'POST'])
 def medication():
     if not current_user.is_authenticated:
-         return redirect(url_for('index'))
+        return redirect(url_for('index'))
     form = MedicationSearchForm()
     if form.validate_on_submit():
         return redirect(url_for('medication_results', name=form.name.data))
@@ -259,7 +259,7 @@ def medication_results(name):
     result6 = cursor.fetchall()
     cursor.execute(f"SELECT * from prescription where prescription_id LIKE'%{name}%'")
     result7 = cursor.fetchall()
-    return render_template('medication_results.html',  result=result, result1=result1, result2=result2, result3=result3, result4=result4, result5=result5,result6=result6,result7=result7, name=name, results=results)
+    return render_template('medication_results.html',  result=result, result1=result1, result2=result2, result3=result3, result4=result4, result5=result5,result6=result6,result7=result7, name=name, results=results,user=current_user)
 
 @login_required
 @app.route('/medicationadd', methods=['GET', 'POST'])
@@ -274,7 +274,7 @@ def medicationADD():
         cursor.execute(executeStr, (int(Medication_ID), Medication_name, Generic, Dosage,))
         connection.commit()
         return redirect(url_for('index'))
-    return render_template('medicationadd_result.html', form=form, user=None)
+    return render_template('medicationadd_result.html', form=form, user=current_user)
 
 @login_required
 @app.route('/pharmacyadd', methods=['GET', 'POST'])
@@ -288,5 +288,5 @@ def pharmacyADD():
         cursor.execute(executeStr, (int(Pharmacy_ID),name, address,))
         connection.commit()
         return redirect(url_for('index'))
-    return render_template('pharmacy_add.html', form=form, user=None)
+    return render_template('pharmacy_add.html', form=form, user=current_user)
 
