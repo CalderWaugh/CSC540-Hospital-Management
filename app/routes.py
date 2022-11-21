@@ -5,7 +5,7 @@ from typing import Optional
 import requests
 from app import app, connection, cursor, users
 from flask import render_template, redirect, url_for, flash, send_file
-from app.forms import buildLoginForm, buildSignupForm,medSignupForm, SignupAccTypeForm,pharmSignupForm, MedicationSearchForm,PatientSearchForm, SignupAccTypeForm, SelectLoginForm
+from app.forms import buildLoginForm, buildSignupForm,medSignupForm, SignupAccTypeForm,prescriptSignupForm,pharmSignupForm, MedicationSearchForm,PatientSearchForm, SignupAccTypeForm, SelectLoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 from mysql.connector import Error
@@ -241,6 +241,7 @@ def new_appointment(patient_id):
 def medication_results(name):
     if not current_user.is_authenticated:
         return redirect(url_for('index'))
+    form = MedicationSearchForm()    
     cursor.execute(f"select medication_id, medication_name, generic, dosage from medication where medication_id LIKE '%{name}%'")
     results = cursor.fetchall()
     cursor.execute(f"SELECT prescription.medication_id, prescription.patient_id, prescription.pharmacy_ID,prescription.prescription_id,prescription.refills FROM prescription RIGHT JOIN medication ON prescription.medication_id = medication.medication_id where medication_name LIKE'%{name}%'")
@@ -259,7 +260,7 @@ def medication_results(name):
     result6 = cursor.fetchall()
     cursor.execute(f"SELECT * from prescription where prescription_id LIKE'%{name}%'")
     result7 = cursor.fetchall()
-    return render_template('medication_results.html',  result=result, result1=result1, result2=result2, result3=result3, result4=result4, result5=result5,result6=result6,result7=result7, name=name, results=results,user=current_user)
+    return render_template('medication_results.html',  result=result, result1=result1, result2=result2, result3=result3, result4=result4, result5=result5,result6=result6,result7=result7, name=name, results=results,form=form,user=current_user)
 
 @login_required
 @app.route('/medicationadd', methods=['GET', 'POST'])
@@ -289,4 +290,22 @@ def pharmacyADD():
         connection.commit()
         return redirect(url_for('index'))
     return render_template('pharmacy_add.html', form=form, user=current_user)
+
+@login_required
+@app.route('/prescriptionadd', methods=['GET', 'POST'])
+def prescriptionadd():
+    form = prescriptSignupForm('prescription')
+    if form.validate_on_submit():
+        executeStr = f"INSERT INTO prescription VALUES (%s,%s,%s,%s,%s,%s,%s)"
+        Prescription_ID = form.emp_id.data
+        Pharmacy_ID = form.name.data
+        Medication_ID = form.department.data
+        Patient_ID = form.position.data
+        Date_Prescribed = form.date.data
+        Current_diagnosis_severity = form.diagnosis.data
+        refills = form.amnt.data
+        cursor.execute(executeStr, (int(Prescription_ID),Pharmacy_ID, Medication_ID,Patient_ID,Date_Prescribed, Current_diagnosis_severity,refills,))
+        connection.commit()
+        return redirect(url_for('index'))
+    return render_template('prescriptadd_results.html', form=form, user=current_user)
 

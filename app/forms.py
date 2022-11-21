@@ -93,3 +93,27 @@ def pharmSignupForm(data):
             department = StringField('address', validators=[DataRequired()])
             submit = SubmitField('submit')
     return SignupForm()
+
+def prescriptSignupForm(data):
+    if data=='doctor':
+         class SignupForm(FlaskForm):
+            emp_id = StringField('Doctor Employee ID', validators=[DataRequired()])
+            name = StringField('Name', validators=[DataRequired()])
+            department = StringField('Department', validators=[DataRequired()])
+            position = StringField('Position', validators=[DataRequired()])
+            password = PasswordField('Password', validators=[DataRequired()])
+            date = StringField('Date_Prescribed', validators=[DataRequired()])
+            diagnosis = StringField('Current_diagnosis_severity', validators=[DataRequired()])
+            amnt = StringField('refills', validators=[DataRequired()])
+            submit = SubmitField('Sign up')
+    else:
+        class SignupForm(FlaskForm):
+            emp_id = StringField('Prescription_ID', validators=[DataRequired()])
+            name = StringField('Pharmacy_ID', validators=[DataRequired()])
+            department = StringField('Medication_ID', validators=[DataRequired()])
+            position = StringField('Patient_ID', validators=[DataRequired()])
+            date = StringField('Date_Prescribed', validators=[DataRequired()])
+            diagnosis = StringField('Current_diagnosis_severity', validators=[DataRequired()])
+            amnt = StringField('refills', validators=[DataRequired()])
+            submit = SubmitField('submit')
+    return SignupForm()
