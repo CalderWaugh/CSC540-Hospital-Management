@@ -6,14 +6,19 @@
         <div style="margin: 0 20px;">
             <h3>Upcoming Appointments</h3>
             <table class="table table-primary">
+                <tr>
+                    <th>Date</th>
+                    <th>Doctor</th>
+                    <th>Status</th>
+                </tr>
                 {% for a in appointments %}
                 <tr>
-                    <td>{{a[0]}}</td>
                     <td>{{a[1]}}</td>
+                    <td>{{a[0]}}</td>
                     <td>{{a[2]}}</td>
                 </tr>
                 {% endfor %}
-                <button href="/appointments/new/{{patient[0]}}" class="button">Create Appointment</button>
+                <tr><button class="button"><a href="/appointments/new/{{patient[0]}}">Create Appointment</a></button></tr>
             </table>
         </div>
         <div style="margin: 0 20px;">

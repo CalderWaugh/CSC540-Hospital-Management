@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Search time</h2>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.date.label }} <br>
+            {{ form.date() }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}

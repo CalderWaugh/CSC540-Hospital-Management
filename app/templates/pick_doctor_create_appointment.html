@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- <h3>Current user id: {{id}}</h3> -->
+    <h2>Search Doctor</h2>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.doctor_name.label }} <br>
+            {{ form.doctor_name() }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}

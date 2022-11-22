@@ -1,14 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h3>Appointments for {{doc_name}}</h3>
+    <h3>Doctors</h3>
     <div style="padding: 0 25%;">
         <table class="table" style="background-color: #88D498;">
-            {% for a in appointments %}
+            {% for res in docs %}
                 <tr>
-                    <td>{{a[0]}} {{a[1]}}</td>
-                    <td>{{a[2]}}</td>
-                    <td>{{a[3]}}</td>
+                    <td><a href="/appointments/new/{{pat_id}}/{{res[0]}}">{{res[0]}} {{res[2]}}</a></td>
                 </tr>
             {% endfor %}
         </table>
