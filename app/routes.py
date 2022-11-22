@@ -5,7 +5,7 @@ from typing import Optional
 import requests
 from app import app, connection, cursor, users
 from flask import render_template, redirect, url_for, flash, send_file
-from app.forms import buildLoginForm, buildSignupForm, SignupAccTypeForm, PatientSearchForm, SignupAccTypeForm, SelectLoginForm, AppointmentSearchForm, SelectDoctorAppointmentForm, CreateAppointmentForm, AppointmentTypeForm
+from app.forms import buildLoginForm, buildSignupForm,medSignupForm,  SignupAccTypeForm,prescriptSignupForm,pharmSignupForm, MedicationSearchForm, PatientSearchForm, SignupAccTypeForm, SelectLoginForm, AppointmentSearchForm, SelectDoctorAppointmentForm, CreateAppointmentForm, AppointmentTypeForm
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 from mysql.connector import Error
@@ -65,6 +65,20 @@ def login():
     return render_template('choose_login.html', form=form, user=None)
 
 
+
+
+@login_required
+@app.route('/medication', methods=['GET', 'POST'])
+def medication():
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = MedicationSearchForm()
+    if form.validate_on_submit():
+        return redirect(url_for('medication_results', name=form.name.data))
+    return render_template('search_medication.html', form=form)
+
+
+
 @app.route('/signup/doctor', methods=['GET', 'POST'])
 def signup_doctor():
     form = buildSignupForm('doctor')
@@ -96,6 +110,7 @@ def signup_nurse():
         users[int(form.emp_id.data)]=(form.emp_id.data,pward)
         return redirect(url_for('loginnurse'))
     return render_template('signup_nurse.html', form=form, user=None)
+
 
 @app.route('/login/doctor', methods=['GET', 'POST'])
 def logindoctor():
@@ -298,3 +313,78 @@ def new_appointment(patient_id):
     cursor.execute(f"select * from patient where patient_id = {patient_id}")
     patient = cursor.fetchone()
     return render_template('new_appointment.html', patient=patient , user=current_user)
+
+
+@login_required
+@app.route('/medication/<name>', methods=['GET'])
+def medication_results(name):
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = MedicationSearchForm()    
+    cursor.execute(f"select medication_id, medication_name, generic, dosage from medication where medication_id LIKE '%{name}%'")
+    results = cursor.fetchall()
+    cursor.execute(f"SELECT prescription.medication_id, prescription.patient_id, prescription.pharmacy_ID,prescription.prescription_id,prescription.refills FROM prescription RIGHT JOIN medication ON prescription.medication_id = medication.medication_id where medication_name LIKE'%{name}%'")
+    result = cursor.fetchall()
+    cursor.execute(f"select pharmacy_id, prescription_id, date_prescribed, patient_id from prescription where patient_id LIKE '%{name}%'")
+    result1 = cursor.fetchall()
+    cursor.execute(f"SELECT medication_name, generic FROM medication where generic LIKE '%{name}%'")
+    result2 = cursor.fetchall()
+    cursor.execute(f"select pharmacy_id, name,address from pharmacy where pharmacy_id LIKE'%{name}%'")
+    result3 = cursor.fetchall()
+    cursor.execute(f"SELECT prescription.patient_id,prescription.medication_id,patient.first_name, prescription.date_prescribed, prescription.pharmacy_ID,patient.last_name FROM prescription LEFT JOIN patient ON prescription.patient_id = patient.patient_id where last_name LIKE'%{name}%'")
+    result4 = cursor.fetchall()
+    cursor.execute(f"SELECT dosage, medication_name from medication where dosage LIKE'%{name}%'")
+    result5 = cursor.fetchall()
+    cursor.execute(f"SELECT patient_id, last_name from patient where patient_id LIKE'%{name}%'")
+    result6 = cursor.fetchall()
+    cursor.execute(f"SELECT * from prescription where prescription_id LIKE'%{name}%'")
+    result7 = cursor.fetchall()
+    return render_template('medication_results.html',  result=result, result1=result1, result2=result2, result3=result3, result4=result4, result5=result5,result6=result6,result7=result7, name=name, results=results,form=form,user=current_user)
+
+@login_required
+@app.route('/medicationadd', methods=['GET', 'POST'])
+def medicationADD():
+    form = medSignupForm('Medication')
+    if form.validate_on_submit():
+        executeStr = f"INSERT INTO medication VALUES (%s,%s,%s,%s)"
+        Medication_ID = form.emp_id.data
+        Medication_name = form.name.data
+        Generic = form.department.data
+        Dosage = form.position.data
+        cursor.execute(executeStr, (int(Medication_ID), Medication_name, Generic, Dosage,))
+        connection.commit()
+        return redirect(url_for('index'))
+    return render_template('medicationadd_result.html', form=form, user=current_user)
+
+@login_required
+@app.route('/pharmacyadd', methods=['GET', 'POST'])
+def pharmacyADD():
+    form = pharmSignupForm('Pharmacy')
+    if form.validate_on_submit():
+        executeStr = f"INSERT INTO Pharmacy VALUES (%s,%s,%s)"
+        Pharmacy_ID = form.emp_id.data
+        name = form.name.data
+        address = form.department.data
+        cursor.execute(executeStr, (int(Pharmacy_ID),name, address,))
+        connection.commit()
+        return redirect(url_for('index'))
+    return render_template('pharmacy_add.html', form=form, user=current_user)
+
+@login_required
+@app.route('/prescriptionadd', methods=['GET', 'POST'])
+def prescriptionadd():
+    form = prescriptSignupForm('prescription')
+    if form.validate_on_submit():
+        executeStr = f"INSERT INTO prescription VALUES (%s,%s,%s,%s,%s,%s,%s)"
+        Prescription_ID = form.emp_id.data
+        Pharmacy_ID = form.name.data
+        Medication_ID = form.department.data
+        Patient_ID = form.position.data
+        Date_Prescribed = form.date.data
+        Current_diagnosis_severity = form.diagnosis.data
+        refills = form.amnt.data
+        cursor.execute(executeStr, (int(Prescription_ID),Pharmacy_ID, Medication_ID,Patient_ID,Date_Prescribed, Current_diagnosis_severity,refills,))
+        connection.commit()
+        return redirect(url_for('index'))
+    return render_template('prescriptadd_results.html', form=form, user=current_user)
+

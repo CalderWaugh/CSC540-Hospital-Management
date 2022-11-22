@@ -1,0 +1,214 @@
+{% extends "base.html" %} {% block content %}
+<h3>Medications</h3>
+
+
+
+<div style="padding: 0 25%;">
+    <table class="table" style="background-color: #88d498;">
+        {% for res in result %}
+        <tr>
+
+
+
+            <td>Medication ID <br>{{res[0]}}</td>
+            <td>Patient ID<br>{{res[1]}} </td>
+
+            <td>Pharmacy ID<br>{{res[2]}}</td>
+            <td>Prescription ID<br>{{res[3]}}</td>
+            <td>refills<br>{{res[4]}}</td>
+
+        </tr>
+
+
+        {% endfor %}
+
+
+    </table>
+
+
+
+    <div style="padding: 0 25%;">
+        <table class="table" style="background-color: #88d498;">
+            {% for res in results %}
+            <tr>
+
+
+
+                <td>Medication ID<br>{{res[0]}}</td>
+                <td>Medication Name<br>{{res[1]}} </td>
+
+                <td>Generic Name<br>{{res[2]}}</td>
+
+                <td>Recommended Dosage<br>{{res[3]}}</td>
+
+
+
+            </tr>
+
+
+            {% endfor %}
+
+
+        </table>
+
+        <div style="padding: 0 25%;">
+            <table class="table" style="background-color: #88d498;">
+                {% for res in result1 %}
+                <tr>
+
+
+
+                    <td>Pharmacy ID<br>{{res[0]}}</td>
+                    <td>Prescription ID<br>{{res[1]}} </td>
+
+                    <td>Date Prescribed<br>{{res[2]}}</td>
+
+                    <td>Patient ID<br>{{res[3]}}</td>
+
+
+                </tr>
+
+
+                {% endfor %}
+
+
+            </table>
+
+
+            <div style="padding: 0 25%;">
+                <table class="table" style="background-color: #88d498;">
+                    {% for res in result2 %}
+                    <tr>
+
+
+
+                        <td>Name-Brand<br>{{res[0]}}</td>
+                        <td>Generic-Brand<br>{{res[1]}} </td>
+
+
+
+                    </tr>
+
+
+                    {% endfor %}
+
+
+                </table>
+
+
+                <div style="padding: 0 25%;">
+                    <table class="table" style="background-color: #88d498;">
+                        {% for res in result3 %}
+                        <tr>
+
+
+
+                            <td>Prescription ID<br>{{res[0]}}</td>
+                            <td>Pharmacy Name<br>{{res[1]}} </td>
+                            <td>Pharmacy Address<br>{{res[2]}} </td>
+
+
+                        </tr>
+
+
+                        {% endfor %}
+
+
+                    </table>
+
+                    <div style="padding: 0 5%;">
+                        <table class="table" style="background-color: #88d498;">
+                            {% for res in result4 %}
+                            <tr>
+
+
+
+                                <td>Patient ID <br>{{res[0]}}</td>
+                                <td>Medication ID<br>{{res[1]}} </td>
+
+                                <td>First Name<br>{{res[2]}}</td>
+                                <td>Date Prescribed<br>{{res[3]}}</td>
+
+                                <td>Pharmacy ID <br>{{res[4]}}</td>
+                                <td>Last Name<br>{{res[5]}} </td>
+
+
+
+                            </tr>
+
+
+                            {% endfor %}
+
+
+                        </table>
+
+
+                        <div style="padding: 0 5%;">
+                            <table class="table" style="background-color: #88d498;">
+                                {% for res in result5 %}
+                                <tr>
+
+
+
+                                    <td>Dosage <br>{{res[0]}}</td>
+                                    <td>Medicine<br>{{res[1]}}</td>
+
+                                </tr>
+
+
+                                {% endfor %}
+
+
+                            </table>
+
+
+                            <div style="padding: 0 5%;">
+                                <table class="table" style="background-color: #88d498;">
+                                    {% for res in result6 %}
+                                    <tr>
+
+
+
+                                        <td>Patient ID <br>{{res[0]}}</td>
+                                        <td>Last Name<br>{{res[1]}}</td>
+
+                                    </tr>
+
+
+                                    {% endfor %}
+
+
+                                </table>
+
+
+                                <div style="padding: 0 5%;">
+                                    <table class="table" style="background-color: #88d498;">
+                                        {% for res in result7 %}
+                                        <tr>
+
+                                            <td>Prescription ID <br>{{res[0]}}</td>
+                                            <td>Pharmacy ID<br>{{res[1]}} </td>
+
+                                            <td>Medication ID<br>{{res[2]}}</td>
+                                            <td>Paitient ID<br>{{res[3]}}</td>
+
+                                            <td>Date Prescribed <br>{{res[4]}}</td>
+                                            <td>Current diagnosis Severity<br>{{res[5]}} </td>
+                                            <td>Refills<br>{{res[6]}} </td>
+
+                                        </tr>
+
+
+                                        {% endfor %}
+
+
+                                    </table>
+
+
+
+                                </div>
+
+
+
+
+                                {% for res in results %} {% endfor %} {% endblock %}
