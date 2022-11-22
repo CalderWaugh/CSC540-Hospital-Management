@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h3>Appointment for {{patient}} </h3>
+    <h3>with {{doc_name}}</h3>
+    <h2>on {{date}}</h2>
+    <div style="padding: 0 25%;">
+        <table class="table" style="background-color: #88D498;">
+            {% for t in times.keys() %}
+                <tr>
+                    {% if times[t] %}
+                    {% if t < 10 %}
+                    <td><a href="/appointments/new/{{pat_id}}/{{doc_id}}/{{date}}/0{{t}}:00:00">0{{t}}:00</a></td>
+                    {% else %}
+                    <td><a href="/appointments/new/{{pat_id}}/{{doc_id}}/{{date}}/{{t}}:00:00">{{t}}:00</a></td>
+                    {% endif %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    
+{% endblock %}

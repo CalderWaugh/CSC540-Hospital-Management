@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Enter appointment info</h2>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.admission_type.label }} <br>
+            {{ form.admission_type() }}
+        </p>
+        <p>
+            {{ form.exam_type.label }} <br>
+            {{ form.exam_type() }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}

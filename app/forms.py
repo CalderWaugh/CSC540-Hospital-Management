@@ -1,3 +1,4 @@
+from datetime import date
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, StringField, PasswordField, SelectField, ValidationError, BooleanField, DateField
 from wtforms.validators import DataRequired, Optional
@@ -47,10 +48,23 @@ class PatientSearchForm(FlaskForm):
     first_name = StringField('First name')
     last_name = StringField('Last name')
     submit = SubmitField('Search')
+    
+class AppointmentSearchForm(FlaskForm):
+    date = DateField('DatePicker', format='%Y-%m-%d', default=date.today())
+    submit = SubmitField('Search')
 
-class CreateAppointmentDoctorForm(FlaskForm):
+class SelectDoctorAppointmentForm(FlaskForm):
+    doctor_name = StringField('Doctor')
+    submit = SubmitField('Continue')
+    
+class SelectPatientAppointmentForm(FlaskForm):
+    patient_name = StringField('Patient')
+    submit = SubmitField('Continue')
+
+class CreateAppointmentForm(FlaskForm):
     doctor_name = StringField('Doctor')
     submit = SubmitField('Search')
+
 class MedicationSearchForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     submit = SubmitField('Search')
@@ -117,3 +131,10 @@ def prescriptSignupForm(data):
             amnt = StringField('refills', validators=[DataRequired()])
             submit = SubmitField('submit')
     return SignupForm()
+
+
+class AppointmentTypeForm(FlaskForm):
+    admission_type = StringField('Admission Type')
+    exam_type = StringField('Exam Type')
+    submit = SubmitField('Create')
+    
