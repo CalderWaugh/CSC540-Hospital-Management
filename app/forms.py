@@ -69,6 +69,11 @@ class MedicationSearchForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     submit = SubmitField('Search')
 
+class PharmacySearchForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    submit = SubmitField('Search')
+
+
 def medSignupForm(data):
     if data=='doctor':
         class SignupForm(FlaskForm):

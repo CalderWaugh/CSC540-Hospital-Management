@@ -5,7 +5,7 @@ from typing import Optional
 import requests
 from app import app, connection, cursor, users
 from flask import render_template, redirect, url_for, flash, send_file
-from app.forms import buildLoginForm, buildSignupForm,medSignupForm,  SignupAccTypeForm,prescriptSignupForm,pharmSignupForm, MedicationSearchForm, PatientSearchForm, SignupAccTypeForm, SelectLoginForm, AppointmentSearchForm, SelectDoctorAppointmentForm, CreateAppointmentForm, AppointmentTypeForm
+from app.forms import buildLoginForm, buildSignupForm,medSignupForm,PharmacySearchForm,SignupAccTypeForm,prescriptSignupForm,pharmSignupForm, MedicationSearchForm, PatientSearchForm, SignupAccTypeForm, SelectLoginForm, AppointmentSearchForm, SelectDoctorAppointmentForm, CreateAppointmentForm, AppointmentTypeForm
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 from mysql.connector import Error
@@ -76,6 +76,18 @@ def medication():
     if form.validate_on_submit():
         return redirect(url_for('medication_results', name=form.name.data))
     return render_template('search_medication.html', form=form)
+
+@login_required
+@app.route('/pharmacy', methods=['GET', 'POST'])
+def pharmacy():
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = PharmacySearchForm()
+    if form.validate_on_submit():
+        return redirect(url_for('Pharmacy_results', name=form.name.data))
+    return render_template('search_pharmacy.html', form=form)
+
+
 
 
 
@@ -321,25 +333,40 @@ def medication_results(name):
     if not current_user.is_authenticated:
         return redirect(url_for('index'))
     form = MedicationSearchForm()    
-    cursor.execute(f"select medication_id, medication_name, generic, dosage from medication where medication_id LIKE '%{name}%'")
+    cursor.execute(f"select medication_id, medication_name, generic, dosage from medication where medication_name LIKE '%{name}%'")
     results = cursor.fetchall()
-    cursor.execute(f"SELECT prescription.medication_id, prescription.patient_id, prescription.pharmacy_ID,prescription.prescription_id,prescription.refills FROM prescription RIGHT JOIN medication ON prescription.medication_id = medication.medication_id where medication_name LIKE'%{name}%'")
-    result = cursor.fetchall()
-    cursor.execute(f"select pharmacy_id, prescription_id, date_prescribed, patient_id from prescription where patient_id LIKE '%{name}%'")
-    result1 = cursor.fetchall()
+   #cursor.execute(f"SELECT prescription.medication_id, prescription.patient_id, prescription.pharmacy_ID,prescription.prescription_id,prescription.refills FROM prescription RIGHT JOIN medication ON prescription.medication_id = medication.medication_id where medication_name LIKE'%{name}%'")
+    #result = cursor.fetchall()
     cursor.execute(f"SELECT medication_name, generic FROM medication where generic LIKE '%{name}%'")
     result2 = cursor.fetchall()
     cursor.execute(f"select pharmacy_id, name,address from pharmacy where pharmacy_id LIKE'%{name}%'")
     result3 = cursor.fetchall()
-    cursor.execute(f"SELECT prescription.patient_id,prescription.medication_id,patient.first_name, prescription.date_prescribed, prescription.pharmacy_ID,patient.last_name FROM prescription LEFT JOIN patient ON prescription.patient_id = patient.patient_id where last_name LIKE'%{name}%'")
-    result4 = cursor.fetchall()
+   # cursor.execute(f"SELECT prescription.patient_id,prescription.medication_id,patient.first_name, prescription.date_prescribed, prescription.pharmacy_ID,patient.last_name FROM prescription LEFT JOIN patient ON prescription.patient_id = patient.patient_id where last_name LIKE'%{name}%'")
+   # result4 = cursor.fetchall()
     cursor.execute(f"SELECT dosage, medication_name from medication where dosage LIKE'%{name}%'")
     result5 = cursor.fetchall()
-    cursor.execute(f"SELECT patient_id, last_name from patient where patient_id LIKE'%{name}%'")
-    result6 = cursor.fetchall()
-    cursor.execute(f"SELECT * from prescription where prescription_id LIKE'%{name}%'")
-    result7 = cursor.fetchall()
-    return render_template('medication_results.html',  result=result, result1=result1, result2=result2, result3=result3, result4=result4, result5=result5,result6=result6,result7=result7, name=name, results=results,form=form,user=current_user)
+    #cursor.execute(f"SELECT patient_id, last_name from patient where patient_id LIKE'%{name}%'")
+   # result6 = cursor.fetchall()
+    #cursor.execute(f"SELECT * from prescription where prescription_id LIKE'%{name}%'")
+    #result7 = cursor.fetchall()
+    #cursor.execute(f"SELECT prescription.medication_id, prescription.pharmacy_ID FROM prescription RIGHT JOIN medication ON prescription.medication_id = medication.medication_id where medication_id LIKE '%{name}%'")
+    #result4 = cursor.fetchall()
+    return render_template('medication_results.html', results=results,result2=result2, result3=result3,  result5=result5, name=name, form=form,user=current_user)
+
+
+@login_required
+@app.route('/pharmacy/<name>', methods=['GET'])
+def Pharmacy_results(name):
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = PharmacySearchForm()  
+    cursor.execute(f"select * from pharmacy where pharmacy_id LIKE '%{name}%'")
+    results = cursor.fetchall()
+    cursor.execute(f"select name, address from pharmacy where name LIKE '%{name}%'")
+    result1 = cursor.fetchall()
+    return render_template('pharmacy_results.html',  results=results, result1=result1,name=name,form=form,user=current_user)
+
+
 
 @login_required
 @app.route('/medicationadd', methods=['GET', 'POST'])

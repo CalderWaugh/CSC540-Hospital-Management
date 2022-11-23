@@ -1,0 +1,117 @@
+{% extends "base.html" %} {% block content %}
+<h3>Pharmacy</h3>
+
+
+
+<div style="padding: 0 25%;">
+    <table class="table" style="background-color: #88d498;">
+        {% for res in result %}
+        <tr>
+
+
+
+            <td>Pharmacy ID <br>{{res[0]}}</td>
+            <td>Pharmacy Name<br>{{res[1]}} </td>
+
+            <td>Address<br>{{res[2]}}</td>
+           
+           
+
+        </tr>
+
+
+        {% endfor %}
+
+
+    </table>
+
+
+
+    <div style="padding: 0 25%;">
+        <table class="table" style="background-color: #88d498;">
+            {% for res in results %}
+            <tr>
+
+
+
+                <td>Pharmacy ID <br>{{res[0]}}</td>
+                <td>Pharmacy Name<br>{{res[1]}} </td>
+    
+                <td>Address<br>{{res[2]}}</td>
+
+            </tr>
+
+
+            {% endfor %}
+
+
+        </table>
+
+        <div style="padding: 0 25%;">
+            <table class="table" style="background-color: #88d498;">
+                {% for res in result1 %}
+                <tr>
+
+
+
+                    <td>Pharmacy name<br>{{res[0]}}</td>
+              
+                    <td>Pharmacy Address<br>{{res[1]}}</td>
+
+                </tr>
+
+
+                {% endfor %}
+
+
+            </table>
+
+
+            <div style="padding: 0 25%;">
+                <table class="table" style="background-color: #88d498;">
+                    {% for res in result2 %}
+                    <tr>
+
+
+
+                        <td>Name-Brand<br>{{res[0]}}</td>
+                        <td>Generic-Brand<br>{{res[1]}} </td>
+
+
+
+                    </tr>
+
+
+                    {% endfor %}
+
+
+                </table>
+
+
+                <div style="padding: 0 25%;">
+                    <table class="table" style="background-color: #88d498;">
+                        {% for res in result3 %}
+                        <tr>
+
+
+
+                            <td>Prescription ID<br>{{res[0]}}</td>
+                            <td>Pharmacy Name<br>{{res[1]}} </td>
+                            <td>Pharmacy Address<br>{{res[2]}} </td>
+
+
+                        </tr>
+
+
+                        {% endfor %}
+
+
+                    </table>
+
+                  
+                                </div>
+
+
+
+
+                                {% for res in results %} {% endfor %} {% endblock %}
