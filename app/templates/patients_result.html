@@ -1,15 +1,44 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h3>Matching Patients</h3>
+    <h3>Matching Patients for "{{name}}"</h3>
     <div style="padding: 0 25%;">
-        <table class="table" style="background-color: #88D498;">
+        <table class="table styler" style="background-color: #88D498">
+            <tr>
+                <th>Patient</th>
+            </tr>
             {% for res in results %}
                 <tr>
-                    <td>{{res[0]}}</td>
                     <td><a href="/patient/{{res[0]}}">{{res[1]}} {{res[2]}}</a></td>
                 </tr>
             {% endfor %}
+        </table>
+        <table class="table styler" style="background-color: #88D498">
+            <tr>
+                <td>Page results: {{results|length}}</td>
+                <td>Pages</td>
+                {% for p in pages %}
+                    {% if route == "fl" %}
+                        {% if p == page %}
+                            <td><a class="active" href="/patients/{{name.split(" ")[0]}}/{{name.split(" ")[1]}}/{{p}}">{{p}}</a></td>
+                        {% else %}
+                            <td><a href="/patients/{{name.split(" ")[0]}}/{{name.split(" ")[1]}}/{{p}}">{{p}}</a></td>
+                        {% endif %}
+                    {% elif route == "f" %}
+                        {% if p == page %}
+                            <td><a class="active" href="/patients/fname/{{name}}/{{p}}">{{p}}</a></td>
+                        {% else %}
+                            <td><a href="/patients/fname/{{name}}/{{p}}">{{p}}</a></td>
+                        {% endif %}
+                    {% elif route == "l" %}
+                        {% if p == page %}
+                            <td><a class="active" href="/patients/lname/{{name}}/{{p}}">{{p}}</a></td>
+                        {% else %}
+                            <td><a href="/patients/lname/{{name}}/{{p}}">{{p}}</a></td>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </tr>
         </table>
     </div>
     

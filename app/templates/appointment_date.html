@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div style="padding: 0 20%;">
+        {% if not apps %}
+        <p>No appointments</p>
+        {% else %}
+        <h3>Appointments</h3>
+        <div class="styler" style="text-align: center; border-radius: 10px 10px 0 0; margin: 20px 0; padding: 5px; background-color: #88D498;">
+            <p><u>Date</u>: <strong>{{date}}</strong></p>
+        </div>
+        <table class="table styler" style="background-color: #88D498;">
+                <tr>
+                    <th>Doctor</th>
+                    <th>Patient</th>
+                    <th>Appointment Time</th>
+                    <th>Discharge Time</th>
+                    <th>Status</th>
+                    <th>Change Status</th>
+                </tr>
+            {% for a in apps %}
+                <tr>
+                    <td><a href="/appointments/docdate/{{a[4]}}/{{a[7]}}/1">{{a[4]}}</a></td>
+                    <td><a href="/patient/{{a[6]}}">{{a[0]}} {{a[1]}}</a></td>
+                    <td>{{a[2]}}</td>
+                    {% if a[5] %}
+                    <td>{{a[5]}}</td>
+                    {% else %}
+                    <td>Not discharged</td>
+                    {% endif %}
+                    <td>{{a[3]}}</td>
+                    <td><a href="/appointments/edit/{{a[4]}}/{{a[7]}}">Edit</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+        <table class="table styler" style="background-color: #88D498">
+            <tr>
+                <td>Page results: {{apps|length}}</td>
+                <td>Pages</td>
+                {% for p in pages %}
+                {% if p == page %}
+                <td><a class="active" href="/appointments/date/{{date}}/{{p}}">{{p}}</a></td>
+                {% else %}
+                <td><a href="/appointments/date/{{date}}/{{p}}">{{p}}</a></td>
+                {% endif %}
+                {% endfor %}
+            </tr>
+        </table>
+        {% endif %}
+    </div>
+    
+{% endblock %}

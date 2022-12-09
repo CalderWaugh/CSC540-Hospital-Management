@@ -13,6 +13,15 @@
         .navbar {
           background-color: #C6DABF;
         }
+        .active {
+          color: rgb(233, 233, 233);
+        }
+        .styler {
+          box-shadow: 2px 2px 2px black;
+        }
+        tr {
+          text-align: center;
+        }
       </style>
 
       <title>MeDClinic</title>
@@ -29,12 +38,11 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               {% if user %}
               <li class='nav-item nav-item-left'><a class="nav-link" href="/patients">Patients</a></li>
-              <li class='nav-item nav-item-left'><a class="nav-link" href="/myappointments">My Appointments</a></li>
-              <li class='nav-item nav-item-left'><a class="nav-link" href="/medication">Medication</a></li>
-              <li class='nav-item nav-item-left'><a class="nav-link" href="/medicationadd">Medication Add</a></li>
-              <li class='nav-item nav-item-left'><a class="nav-link" href="/pharmacyadd">Pharmacy</a></li>
-              <li class='nav-item nav-item-left'><a class="nav-link" href="/prescriptionadd">Prescription</a></li>
               <li class='nav-item nav-item-left'><a class="nav-link" href="/appointments">Appointments</a></li>
+              {% if user.doc %}
+              <li class='nav-item nav-item-left'><a class="nav-link" href="/myappointments">My Appointments</a></li>
+              {% endif %}
+              <li class='nav-item nav-item-left'><a class="nav-link" href="/medications">Medication</a></li>
               {% endif %}
             </ul>
             <ul class="navbar-nav d-flex">

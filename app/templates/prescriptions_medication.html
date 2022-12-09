@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h3>{{med_name}} Prescriptions</h3>
+    <div style="padding: 0 25%;">
+        <table class="table" style="background-color: #88D498;">
+            <tr>
+                <th>Name</th>
+                <th>Pharmacy</th>
+                <th>Date Prescribed</th>
+                <th>Dosage</th>
+                <th>Refills</th>
+            </tr>
+            {% for p in prescriptions %}
+            <tr>
+                <td>{{p[0]}} {{p[1]}}</td>
+                <td>{{p[5]}}</td>
+                <td>{{p[3]}}</td>
+                <td>{{p[2]}}</td>
+                <td>{{p[4]}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <table class="table" style="background-color: #88D498">
+            <tr>
+                <td>Page results: {{prescriptions|length}}</td>
+                <td>Pages</td>
+                {% for p in pages %}
+                {% if p == page %}
+                <td><a class="active" href="/prescriptions/{{med_id}}/{{p}}">{{p}}</a></td>
+                {% else %}
+                <td><a href="/prescriptions/{{med_id}}/{{p}}">{{p}}</a></td>
+                {% endif %}
+                {% endfor %}
+            </tr>
+        </table>
+    </div>
+    
+{% endblock %}

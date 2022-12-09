@@ -1,109 +1,19 @@
 {% extends "base.html" %} {% block content %}
-
-
-
 <h2>Prescription ADD</h2>
-
-
-
 <form action="" method="post" novalidate>
-
-
-
     {{ form.hidden_tag() }}
-
-
-
     <p>
-
-
-
-        {{ form.emp_id.label }} <br> {{ form.emp_id() }}
-
-
-
+        {{ form.pharmacy_id.label }} <br> {{ form.pharmacy_id() }}
     </p>
-
-
-
     <p>
-
-
-
-        {{ form.name.label }} <br> {{ form.name() }}
-
-
-
+        {{ form.medication_id.label }} <br> {{ form.medication_id() }}
     </p>
-
-
-
     <p>
-
-
-
-        {{ form.department.label }} <br> {{ form.department() }}
-
-
-
-    </p>
-
-
-
-    <p>
-
-
-
-        {{ form.position.label }} <br> {{ form.position() }}
-
-
-
-    </p>
-
-
-
-    <p>
-
-
-
-        {{ form.date.label }} <br> {{ form.date() }}
-
-
-
-    </p>
-
-
-
-    <p>
-
-
-
         {{ form.diagnosis.label }} <br> {{ form.diagnosis() }}
-
-
-
     </p>
-
-
-
-
     <p>
-
-
-
-        {{ form.amnt.label }} <br> {{ form.amnt() }}
-
-
-
+        {{ form.refills.label }} <br> {{ form.refills() }}
     </p>
-
-
-
-
     <p>{{form.submit()}}</p>
-
 </form>
-
-
-
 {% endblock %}

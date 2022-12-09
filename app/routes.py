@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from operator import is_
 from os import environ
 
@@ -5,7 +6,7 @@ from typing import Optional
 import requests
 from app import app, connection, cursor, users
 from flask import render_template, redirect, url_for, flash, send_file
-from app.forms import buildLoginForm, buildSignupForm,medSignupForm,  SignupAccTypeForm,prescriptSignupForm,pharmSignupForm, MedicationSearchForm, PatientSearchForm, SignupAccTypeForm, SelectLoginForm, AppointmentSearchForm, SelectDoctorAppointmentForm, CreateAppointmentForm, AppointmentTypeForm
+from app.forms import buildLoginForm, buildSignupForm,MedicationForm,  SignupAccTypeForm,AddPrescriptionForm,pharmSignupForm, MedicationSearchForm, PatientSearchForm, SignupAccTypeForm, SelectLoginForm, AppointmentSearchForm, SelectDoctorAppointmentForm, CreateAppointmentForm, AppointmentTypeForm, BuildEditAppointmentForm
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 from mysql.connector import Error
@@ -22,18 +23,25 @@ from flask_login import (
 
 login_manager = LoginManager(app)
 
+session = {'url':''}
+
+# Set page results for the application
+results = 10
+pages = []
+
 # https://github.com/leynier/flask-login-without-orm
 # Created the User class and load user function with the help of this github repo
 class User(UserMixin):
-    def __init__(self, id: str, password: str):
+    def __init__(self, id: str, password: str, doc: bool):
         self.id = id
         self.password = password
+        self.doc = doc
 
     @staticmethod
     def get(emp_id: str) -> Optional["User"]:
         try: user = users[int(emp_id)]
         except: return None
-        return User(user[0], user[1])
+        return User(user[0], user[1], user[2])
 
 @login_manager.user_loader
 def load_user(user_id: str) -> Optional[User]:
@@ -64,21 +72,6 @@ def login():
             return redirect(url_for('loginnurse'))
     return render_template('choose_login.html', form=form, user=None)
 
-
-
-
-@login_required
-@app.route('/medication', methods=['GET', 'POST'])
-def medication():
-    if not current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = MedicationSearchForm()
-    if form.validate_on_submit():
-        return redirect(url_for('medication_results', name=form.name.data))
-    return render_template('search_medication.html', form=form)
-
-
-
 @app.route('/signup/doctor', methods=['GET', 'POST'])
 def signup_doctor():
     form = buildSignupForm('doctor')
@@ -91,7 +84,7 @@ def signup_doctor():
         registered = True
         cursor.execute(executeStr, (int(form.emp_id.data),int(dept), name, pos, registered,pward,))
         connection.commit()
-        users[int(form.emp_id.data)]=(form.emp_id.data,pward)
+        users[int(form.emp_id.data)]=(form.emp_id.data,pward,True)
         return redirect(url_for('logindoctor'))
     return render_template('signup_doctor.html', form=form, user=None)
 
@@ -107,7 +100,7 @@ def signup_nurse():
         registered = True
         cursor.execute(executeStr, (int(form.emp_id.data),int(dept), name, pos, registered,pward,))
         connection.commit()
-        users[int(form.emp_id.data)]=(form.emp_id.data,pward)
+        users[int(form.emp_id.data)]=(form.emp_id.data,pward,False)
         return redirect(url_for('loginnurse'))
     return render_template('signup_nurse.html', form=form, user=None)
 
@@ -118,8 +111,8 @@ def logindoctor():
     if form.validate_on_submit():
         try: user = User.get(int(form.emp_id.data))
         except: return render_template('login_doctor.html', form=form, user=None, failed=True)
-        if user and check_password_hash(user.password,form.password.data):
-            login_user(User(user.id,user.password))
+        if user and check_password_hash(user.password, form.password.data):
+            login_user(User(user.id,user.password,True))
             return redirect(url_for('index'))
         else: return render_template('login_doctor.html', form=form, user=None, failed=True)
     return render_template('login_doctor.html', form=form, user=None, failed=False)
@@ -131,7 +124,7 @@ def loginnurse():
         try: user = User.get(int(form.emp_id.data))
         except: return render_template('login_nurse.html', form=form, user=None, failed=True)
         if check_password_hash(user.password,form.password.data):
-            login_user(User(user.id,user.password))
+            login_user(User(user.id,user.password,False))
             return redirect(url_for('index'))
     return render_template('login_nurse.html', form=form, user=None, failed=False)
     
@@ -145,13 +138,18 @@ def signupacctype():
         return redirect(url_for('signup_nurse'))
     return render_template('choose_signup.html', form=form, user=None)
 
+###########################################################################################################
+#############################       APPOINTMENTS SECTION        ###########################################
+###########################################################################################################
 
 @login_required
 @app.route('/myappointments', methods=['GET', 'POST'])
 def myappointments():
-    if not current_user.is_authenticated:
+    if not current_user.is_authenticated or not current_user.doc:
         return redirect(url_for('index'))
-    return redirect(url_for('doctor_appointments', doctor_id=current_user.id))
+    cursor.execute(f"select name from doctor where doctor_employee_id = {current_user.id}")
+    doc = (cursor.fetchone())[0]
+    return redirect(url_for('docdate_appointments', name=doc, date=date.today(), page=1))
 
 @login_required
 @app.route('/appointments', methods=['GET', 'POST'])
@@ -159,14 +157,68 @@ def search_appointments():
     if not current_user.is_authenticated:
         return redirect(url_for('index'))
     form = AppointmentSearchForm()
-    cursor.execute(f"select p.first_name, p.last_name, a.admission_date, a.status, d.name from doctor AS d JOIN appointment AS a ON d.doctor_employee_id = a.doctor_employee_id JOIN patient AS p ON a.patient_id = p.patient_id WHERE DATE(a.admission_date) = '{form.date.data}'")
-    apps = cursor.fetchall()
     if form.validate_on_submit():
-        cursor.execute(f"select p.first_name, p.last_name, a.admission_date, a.status, d.name from doctor AS d JOIN appointment AS a ON d.doctor_employee_id = a.doctor_employee_id JOIN patient AS p ON a.patient_id = p.patient_id WHERE DATE(a.admission_date) = '{form.date.data}'")
-        apps = cursor.fetchall()
-        print(f"hello {apps}")
-        return render_template('search_appointments.html', apps=apps, form=form, user=current_user)
-    return render_template('search_appointments.html', apps=apps, form=form, user=current_user)
+        doc_name = form.doc_name.data
+        date = form.date.data
+        if doc_name:
+            return redirect(url_for('docdate_appointments', name=doc_name, date=date, page=1))
+        return redirect(url_for('date_appointments', date=date, page=1))
+    return render_template('search_appointments.html',form=form, user=current_user)
+
+@login_required
+@app.route('/appointments/doc/<doctor_id>', methods=['GET', 'POST'])
+def doctor_appointments(doctor_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
+    cursor.execute(f"select p.first_name, p.last_name, a.admission_date, a.status from appointment AS a JOIN patient AS p ON a.patient_id = p.patient_id where doctor_employee_id = {doctor_id}")
+    results = cursor.fetchall()
+    cursor.execute(f"select * from doctor where doctor_employee_id = {doctor_id}")
+    doc = cursor.fetchone()
+    return render_template('doctor_appointments.html', doc_name=doc[2], appointments=results, user=current_user)
+
+@login_required
+@app.route('/appointments/date/<date>/<page>', methods=['GET', 'POST'])
+def date_appointments(date, page):
+    cursor.execute(f"""
+                        select p.first_name, p.last_name, DATE_FORMAT(a.admission_date,'%h:%i %p'), a.status, d.name, a.discharge_date, p.patient_id, a.admission_date
+                        from doctor AS d 
+                        JOIN appointment AS a ON d.doctor_employee_id = a.doctor_employee_id 
+                        JOIN patient AS p ON a.patient_id = p.patient_id 
+                        WHERE DATE(a.admission_date) = '{date}'
+                        ORDER BY a.admission_date ASC
+                    """)
+    apps = cursor.fetchall()
+    pages = []
+    y=1
+    for x in range(0,len(apps),results):
+        pages.append(y)
+        y+=1
+    session['url'] = url_for('date_appointments', date=date, page=page)
+    page = int(page)-1
+    apps = apps[page*results:(page*results)+results]
+    return render_template('appointment_date.html', date=date, page=page+1,pages=pages, apps=apps, user=current_user)
+
+@login_required
+@app.route('/appointments/docdate/<name>/<date>/<page>', methods=['GET', 'POST'])
+def docdate_appointments(name, date, page):
+    cursor.execute(f"""
+                        select p.first_name, p.last_name, DATE_FORMAT(a.admission_date,'%h:%i %p'), a.status, d.name, a.discharge_date, p.patient_id, d.name, a.admission_date
+                        from doctor AS d 
+                        JOIN appointment AS a ON d.doctor_employee_id = a.doctor_employee_id 
+                        JOIN patient AS p ON a.patient_id = p.patient_id 
+                        WHERE DATE(a.admission_date) = '{date}' and d.name LIKE '%{name}%'
+                        ORDER BY a.admission_date ASC
+                    """)
+    apps = cursor.fetchall()
+    pages = []
+    y=1
+    for x in range(0,len(apps),results):
+        pages.append(y)
+        y+=1
+    session['url'] = url_for('docdate_appointments', name=name, date=date, page=page)
+    page = int(page)-1
+    apps = apps[page*results:(page*results)+results]
+    return render_template('appointment_docdate.html', doc_name=name, date=date, name=name, page=page+1,pages=pages, apps=apps, user=current_user)
 
 @login_required
 @app.route('/appointments/new/<pat_id>', methods=['GET', 'POST'])
@@ -189,7 +241,7 @@ def create_appointment(pat_id, doc_id):
     form = AppointmentSearchForm()
     if form.validate_on_submit():
         times = {8:True,9:True,10:True,11:True,12:True,13:True,14:True,15:True,16:True,17:True,18:True}
-        cursor.execute(f"select d.name, a.admission_date from appointment AS a JOIN doctor AS d ON d.doctor_employee_id = a.doctor_employee_id where a.doctor_employee_id = 1 and DATE(a.admission_date) = '{form.date.data}'")
+        cursor.execute(f"select d.name, a.admission_date from appointment AS a JOIN doctor AS d ON d.doctor_employee_id = a.doctor_employee_id where a.doctor_employee_id = {doc_id} and DATE(a.admission_date) = '{form.date.data}'")
         apps = cursor.fetchall()
         cursor.execute(f"SELECT name FROM doctor WHERE doctor_employee_id = {doc_id}")
         doc_name = (cursor.fetchone())[0]
@@ -211,31 +263,47 @@ def create_appointment_time(pat_id, doc_id, date, time):
         executeStr = f"INSERT INTO appointment(patient_id,doctor_employee_id,nurse_employee_id,status,admission_date,discharge_date,admission_type,exam_type) VALUES (%s,%s, null, 'Not started', %s, null, %s, %s)"
         cursor.execute(executeStr, (pat_id, doc_id,f"{date} {time}",form.admission_type.data,form.exam_type.data,))
         connection.commit()
-        return redirect(url_for('myappointments'))
+        return redirect(url_for('search_appointments'))
     return render_template('app_type_create_appointment.html', form=form, user=current_user)
 
-
-# @login_required
-# @app.route('/appointments/date/<start_date>/<end_date>', methods=['GET', 'POST'])
-# def date_appointments(start_date, end_date):
-#     # cursor.execute(f"select * from appointment where admission_date")
-#     # results = cursor.fetchall()
-#     # cursor.execute(f"select * from doctor where doctor_employee_id = {doctor_id}")
-#     # doc = cursor.fetchone()
-#     return render_template('doctor_appointments.html', user=current_user)
-
-
 @login_required
-@app.route('/appointments/doc/<doctor_id>', methods=['GET', 'POST'])
-def doctor_appointments(doctor_id):
+@app.route('/appointments/edit/<doc_name>/<admin_date>', methods=['GET', 'POST'])
+def edit_appointment(doc_name, admin_date):
     if not current_user.is_authenticated:
         return redirect(url_for('index'))
-    cursor.execute(f"select p.first_name, p.last_name, a.admission_date, a.status from appointment AS a JOIN patient AS p ON a.patient_id = p.patient_id where doctor_employee_id = {doctor_id}")
-    results = cursor.fetchall()
-    cursor.execute(f"select * from doctor where doctor_employee_id = {doctor_id}")
-    doc = cursor.fetchone()
-    return render_template('doctor_appointments.html', doc_name=doc[2], appointments=results, user=current_user)
+    print(admin_date)
+    cursor.execute(f"""
+                        SELECT a.status 
+                        FROM appointment AS a 
+                        JOIN doctor AS d ON a.doctor_employee_id = d.doctor_employee_id
+                        WHERE a.admission_date = '{admin_date}' and d.name = '{doc_name}'
+                    """)
+    stat = (cursor.fetchone())[0]
+    form = BuildEditAppointmentForm(stat)
+    if form.validate_on_submit():
+        print(doc_name)
+        cursor.execute(f"select doctor_employee_id from doctor where name = '{doc_name}'")
+        doc_id = (cursor.fetchone())[0]
+        if form.status.data != 'completed':
+            cursor.execute(f"""
+                UPDATE appointment 
+                SET status = '{form.status.data}', discharge_date = null
+                WHERE doctor_employee_id = {doc_id} and admission_date = '{admin_date}'
+                            """)
+        else:
+            cursor.execute(f"""
+                UPDATE appointment 
+                SET status = 'completed', discharge_date = '{datetime.now()}'
+                WHERE doctor_employee_id = {doc_id} and admission_date = '{admin_date}'
+                            """)
+        connection.commit()
+        return redirect(session['url'])
+    return render_template('edit_appointment.html', form=form, user=current_user)
 
+
+###########################################################################################################
+#############################         PATIENTS SECTION          ###########################################
+###########################################################################################################
 
 @login_required
 @app.route('/patients', methods=['GET', 'POST'])
@@ -246,39 +314,63 @@ def patients():
     if form.validate_on_submit():
         fname = form.first_name.data.replace(" ","")
         lname = form.last_name.data.replace(" ","")
-        if fname and lname: return redirect(url_for('patient_result', first_name=fname, last_name=lname))
-        if fname: return redirect(url_for('patient_result_fname', first_name=fname))
-        if lname: return redirect(url_for('patient_result_lname', last_name=lname))
+        if fname and lname: return redirect(url_for('patient_result', first_name=fname, last_name=lname, page=1))
+        if fname: return redirect(url_for('patient_result_fname', first_name=fname, page=1))
+        if lname: return redirect(url_for('patient_result_lname', last_name=lname, page=1))
     return render_template('search_patients.html', form=form, user=current_user)
 
 @login_required
-@app.route('/patients/<first_name>/<last_name>', methods=['GET'])
-def patient_result(first_name, last_name):
+@app.route('/patients/<first_name>/<last_name>/<page>', methods=['GET'])
+def patient_result(first_name, last_name, page):
     if not current_user.is_authenticated:
         return redirect(url_for('index'))
     cursor.execute(f"select * from patient where first_name LIKE '%{first_name}%' and last_name LIKE '%{last_name}%'")
-    results = cursor.fetchall()
-    return render_template('patients_result.html', name=f"{first_name} {last_name}", results=results, user=current_user)
+    pats = cursor.fetchall()
+    route = "fl"
+    pages = []
+    y=1
+    for x in range(0,len(pats),results):
+        pages.append(y)
+        y+=1
+    page = int(page)-1
+    pats = pats[page*results:(page*results)+results]
+    return render_template('patients_result.html', page = page+1, pages=pages, route=route, name=f"{first_name} {last_name}", results=pats, user=current_user)
 
 
 @login_required
-@app.route('/patients/fname/<first_name>', methods=['GET'])
-def patient_result_fname(first_name):
+@app.route('/patients/fname/<first_name>/<page>', methods=['GET'])
+def patient_result_fname(first_name, page):
     if not current_user.is_authenticated:
         return redirect(url_for('index'))
-    cursor.execute(f"select * from patient where first_name LIKE '%{first_name}%'")
-    results = cursor.fetchall()
-    return render_template('patients_result.html', name=first_name, results=results, user=current_user)
+    cursor.execute(f"select * from patient where first_name LIKE '%{first_name}%' ORDER BY last_name, first_name DESC ")
+    pats = cursor.fetchall()
+    route = "f"
+    pages = []
+    y=1
+    for x in range(0,len(pats),results):
+        pages.append(y)
+        y+=1
+    page = int(page)-1
+    pats = pats[page*results:(page*results)+results]
+    return render_template('patients_result.html', page = page+1, pages=pages, route=route, name=first_name, results=pats, user=current_user)
 
 
 @login_required
-@app.route('/patients/lname/<last_name>', methods=['GET'])
-def patient_result_lname(last_name):
+@app.route('/patients/lname/<last_name>/<page>', methods=['GET'])
+def patient_result_lname(last_name, page):
     if not current_user.is_authenticated:
         return redirect(url_for('index'))
     cursor.execute(f"select * from patient where last_name LIKE '%{last_name}%'")
-    results = cursor.fetchall()
-    return render_template('patients_result.html', name=last_name, results=results, user=current_user)
+    pats = cursor.fetchall()
+    route = "l"
+    pages = []
+    y=1
+    for x in range(0,len(pats),results):
+        pages.append(y)
+        y+=1
+    page = int(page)-1
+    pats = pats[page*results:(page*results)+results]
+    return render_template('patients_result.html', page = page+1, pages=pages, route=route, name=last_name, results=pats, user=current_user)
 
 @app.route('/patient/<id>')
 def viewpatient(id):
@@ -294,7 +386,7 @@ def viewpatient(id):
                     """)
     prescriptions = cursor.fetchall()
     cursor.execute(f"""
-                        select d.name, a.admission_date, a.status
+                        select d.name, DATE_FORMAT(a.admission_date,'%M %d, %Y %h:%i %p'), a.status
                         from appointment AS a
                         JOIN doctor AS d
                         ON a.doctor_employee_id = d.doctor_employee_id
@@ -303,48 +395,53 @@ def viewpatient(id):
                     """)
     appointments = cursor.fetchall()
     return render_template('viewpatient.html', patient=patient, prescriptions=prescriptions, appointments=appointments, user=current_user)
-    
+
+###########################################################################################################
+#############################        MEDICATION SECTION         ###########################################
+###########################################################################################################
 
 @login_required
-@app.route('/appointments/new/<patient_id>', methods=['GET'])
-def new_appointment(patient_id):
+@app.route('/medication', methods=['GET', 'POST'])
+def medication():
     if not current_user.is_authenticated:
         return redirect(url_for('index'))
-    cursor.execute(f"select * from patient where patient_id = {patient_id}")
-    patient = cursor.fetchone()
-    return render_template('new_appointment.html', patient=patient , user=current_user)
-
+    form = MedicationSearchForm()
+    if form.validate_on_submit():
+        return redirect(url_for('medication_results', name=form.name.data))
+    return render_template('search_medication.html', form=form)
 
 @login_required
-@app.route('/medication/<name>', methods=['GET'])
-def medication_results(name):
+@app.route('/medications', methods=['GET', 'POST'])
+def medications():
     if not current_user.is_authenticated:
         return redirect(url_for('index'))
-    form = MedicationSearchForm()    
-    cursor.execute(f"select medication_id, medication_name, generic, dosage from medication where medication_id LIKE '%{name}%'")
-    results = cursor.fetchall()
-    cursor.execute(f"SELECT prescription.medication_id, prescription.patient_id, prescription.pharmacy_ID,prescription.prescription_id,prescription.refills FROM prescription RIGHT JOIN medication ON prescription.medication_id = medication.medication_id where medication_name LIKE'%{name}%'")
-    result = cursor.fetchall()
-    cursor.execute(f"select pharmacy_id, prescription_id, date_prescribed, patient_id from prescription where patient_id LIKE '%{name}%'")
-    result1 = cursor.fetchall()
-    cursor.execute(f"SELECT medication_name, generic FROM medication where generic LIKE '%{name}%'")
-    result2 = cursor.fetchall()
-    cursor.execute(f"select pharmacy_id, name,address from pharmacy where pharmacy_id LIKE'%{name}%'")
-    result3 = cursor.fetchall()
-    cursor.execute(f"SELECT prescription.patient_id,prescription.medication_id,patient.first_name, prescription.date_prescribed, prescription.pharmacy_ID,patient.last_name FROM prescription LEFT JOIN patient ON prescription.patient_id = patient.patient_id where last_name LIKE'%{name}%'")
-    result4 = cursor.fetchall()
-    cursor.execute(f"SELECT dosage, medication_name from medication where dosage LIKE'%{name}%'")
-    result5 = cursor.fetchall()
-    cursor.execute(f"SELECT patient_id, last_name from patient where patient_id LIKE'%{name}%'")
-    result6 = cursor.fetchall()
-    cursor.execute(f"SELECT * from prescription where prescription_id LIKE'%{name}%'")
-    result7 = cursor.fetchall()
-    return render_template('medication_results.html',  result=result, result1=result1, result2=result2, result3=result3, result4=result4, result5=result5,result6=result6,result7=result7, name=name, results=results,form=form,user=current_user)
+    form = MedicationSearchForm()
+    if form.validate_on_submit():
+        return redirect(url_for('medication_results', name=form.name.data, page=1))
+    return render_template('search_medication.html', form=form, user=current_user)
+
+@login_required
+@app.route('/medications/<name>/<page>', methods=['GET'])
+def medication_results(name,page):
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
+    cursor.execute(f"select * from medication where LOWER(medication_name) LIKE '%{name}%'")
+    meds = cursor.fetchall()
+    pages = []
+    y=1
+    for x in range(0,len(meds),results):
+        pages.append(y)
+        y+=1
+    page = int(page)-1
+    meds = meds[page*results:(page*results)+results]
+    return render_template('medication_results.html', page=(page+1), pages=pages, med_name=name, meds=meds, user=current_user)
 
 @login_required
 @app.route('/medicationadd', methods=['GET', 'POST'])
 def medicationADD():
-    form = medSignupForm('Medication')
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = MedicationForm()
     if form.validate_on_submit():
         executeStr = f"INSERT INTO medication VALUES (%s,%s,%s,%s)"
         Medication_ID = form.emp_id.data
@@ -356,9 +453,15 @@ def medicationADD():
         return redirect(url_for('index'))
     return render_template('medicationadd_result.html', form=form, user=current_user)
 
+###########################################################################################################
+#############################         PHARMACY SECTION          ###########################################
+###########################################################################################################
+
 @login_required
 @app.route('/pharmacyadd', methods=['GET', 'POST'])
 def pharmacyADD():
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
     form = pharmSignupForm('Pharmacy')
     if form.validate_on_submit():
         executeStr = f"INSERT INTO Pharmacy VALUES (%s,%s,%s)"
@@ -370,20 +473,50 @@ def pharmacyADD():
         return redirect(url_for('index'))
     return render_template('pharmacy_add.html', form=form, user=current_user)
 
+###########################################################################################################
+#############################       PRESCRIPTIONS SECTION       ###########################################
+###########################################################################################################
+
 @login_required
-@app.route('/prescriptionadd', methods=['GET', 'POST'])
-def prescriptionadd():
-    form = prescriptSignupForm('prescription')
+@app.route('/prescriptions/<med_id>/<page>', methods=['GET', 'POST'])
+def prescriptions_medication(med_id,page):
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
+    cursor.execute(f"""
+                    select pa.first_name, pa.last_name, m.dosage, pr.date_prescribed, pr.refills, ph.name, m.medication_name
+                    from medication AS m 
+                    JOIN prescription AS pr ON m.medication_id = pr.medication_id
+                    JOIN pharmacy AS ph ON pr.pharmacy_id = ph.pharmacy_id
+                    JOIN patient AS pa ON pr.patient_id = pa.patient_id
+                    where m.medication_id = {med_id}
+                    """)
+    prescriptions = cursor.fetchall()
+    
+    pages = []
+    y=1
+    for x in range(0,len(prescriptions),results):
+        pages.append(y)
+        y+=1
+    page = int(page)-1
+    prescriptions = prescriptions[page*results:(page*results)+results]
+    if prescriptions: med_name = prescriptions[0][6]
+    else: med_name = ''
+    return render_template('prescriptions_medication.html', pages=pages, page=page+1, med_name=med_name, med_id=med_id, prescriptions=prescriptions, user=current_user)
+
+@login_required
+@app.route('/prescription/add/<pat_id>', methods=['GET', 'POST'])
+def prescriptionadd(pat_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = AddPrescriptionForm()
     if form.validate_on_submit():
-        executeStr = f"INSERT INTO prescription VALUES (%s,%s,%s,%s,%s,%s,%s)"
-        Prescription_ID = form.emp_id.data
-        Pharmacy_ID = form.name.data
-        Medication_ID = form.department.data
-        Patient_ID = form.position.data
-        Date_Prescribed = form.date.data
+        executeStr = f"INSERT INTO prescription (pharmacy_id, medication_id, patient_id, date_prescribed, current_diagnosis_severity, refills) VALUES (%s,%s,%s,%s,%s,%s)"
+        Pharmacy_ID = form.pharmacy_id.data
+        Medication_ID = form.medication_id.data
+        Date_Prescribed = date.today()
         Current_diagnosis_severity = form.diagnosis.data
-        refills = form.amnt.data
-        cursor.execute(executeStr, (int(Prescription_ID),Pharmacy_ID, Medication_ID,Patient_ID,Date_Prescribed, Current_diagnosis_severity,refills,))
+        refills = form.refills.data
+        cursor.execute(executeStr, (Pharmacy_ID, Medication_ID,pat_id,Date_Prescribed, Current_diagnosis_severity,refills,))
         connection.commit()
         return redirect(url_for('index'))
     return render_template('prescriptadd_results.html', form=form, user=current_user)

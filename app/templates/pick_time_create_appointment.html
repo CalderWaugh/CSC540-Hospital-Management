@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h3>Appointment for {{patient}} </h3>
-    <h3>with {{doc_name}}</h3>
-    <h2>on {{date}}</h2>
+    <h2>Create Appointment</h2>
+    <div class="styler" style="text-align: center; border-radius: 10px 10px 0 0; margin: 5px 25%; padding: 5px; background-color: #88D498;">
+        <p><u>Patient</u>: <strong>{{patient}}</strong></p>
+        <p><u>Doctor</u>: <strong>{{doc_name}}</strong></p>
+        <p><u>Date</u>: <strong>{{date}}</strong></p>
+    </div>
     <div style="padding: 0 25%;">
-        <table class="table" style="background-color: #88D498;">
+        <table class="table styler" style="border-radius: 0 0 10px 10px; background-color: #88D498;">
+            <tr><th>Available Times</th></tr>
             {% for t in times.keys() %}
                 <tr>
                     {% if times[t] %}

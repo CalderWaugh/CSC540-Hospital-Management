@@ -9,26 +9,11 @@
             {{ form.date.label }} <br>
             {{ form.date() }}
         </p>
+        <p>
+            {{ form.doc_name.label }} <br>
+            {{ form.doc_name() }}
+        </p>
         <p>{{ form.submit() }}</p>
     </form>
-
-    <div style="padding: 0 25%;">
-        <table class="table" style="background-color: #88D498;">
-                <tr>
-                    <th>Doctor</th>
-                    <th>Patient</th>
-                    <th>Time</th>
-                    <th>Status</th>
-                </tr>
-            {% for a in apps %}
-                <tr>
-                    <td>{{a[4]}}</td>
-                    <td>{{a[0]}} {{a[1]}}</td>
-                    <td>{{a[2]}}</td>
-                    <td>{{a[3]}}</td>
-                </tr>
-            {% endfor %}
-        </table>
-    </div>
     
 {% endblock %}
