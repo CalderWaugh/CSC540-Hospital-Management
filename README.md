@@ -1,6 +1,12 @@
 # CSC540-Hospital-Management
 Hospital Management Software Project for CSC 540 at SCSU
 
+# Testing
+```
+Doctor- id: 1234 password: Rjenkins
+Nurse- id: 1101 password: Jbean
+```
+
 # (First time running) How to run
 ```
 Go to base project folder then do the following commands in order:
